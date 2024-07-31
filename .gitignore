@@ -1,0 +1,8 @@
+.env
+node_modules
+
+bin
+*_templ.go*
+
+package-lock.json
+tmp

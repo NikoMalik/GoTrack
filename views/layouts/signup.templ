@@ -1,0 +1,261 @@
+package layouts
+
+
+
+import (
+	// "github.com/NikoMalik/GoTrack/views/components"
+	"github.com/NikoMalik/GoTrack/views/helper"
+	"github.com/nedpals/supabase-go"
+	
+	"github.com/NikoMalik/GoTrack/validate"
+	
+	
+	
+
+
+)
+
+// Signup
+
+
+// Errors map to store form errors
+
+
+// SignupIndexPageData to hold form values and errors
+type SignupParams struct {
+	Email           string `form:"email"`
+	Name string `form:"Name"`
+	Password        string `form:"password"`
+	PasswordConfirmation string `form:"passwordConfirmation"`
+}
+
+
+
+
+
+
+
+
+// SignupErrors is a struct to hold form errors
+type SignupErrors struct {
+	FormErrors validate.Errors
+}
+
+
+
+templ LoginIndex() {
+	@BaseLayout(true) {
+		
+		@helper.MaxWidth("") {
+			<div class="flex justify-center mt-[calc(100vh-100vh+8rem)]">
+			<div class="max-w-md w-full bg-base-300 py-12 px-8 rounded-xl">
+				<h1 class="text-center text-xl  mb-20">Login to GoTrack </h1>
+				@LoginForm(supabase.UserCredentials{}, LoginErrors{}.FormErrors)
+				
+			
+				<a class="text-sm underline" href="/signup">Don't have an account? Signup here.</a>
+			</div>
+		</div>
+		}
+	}
+}
+
+// LoginIndex renders the login page
+//
+
+
+
+// SignupIndex renders the signup page
+templ SignupIndex() {
+	@BaseLayout(true) {
+		
+		@helper.MaxWidth("") {
+			<div class="flex justify-center mt-[calc(100vh-100vh+8rem)]">
+			<div class="max-w-md w-full bg-base-300 py-12 px-8 rounded-xl">
+				<h1 class="text-center text-xl font-black mb-20">Signup to GoTrack </h1>
+				@SignupForm(SignupParams{}, SignupErrors{}.FormErrors)
+				
+
+
+				
+				
+			</div>
+		</div>
+		}
+	}
+}
+
+
+templ SignupSuccess(user *supabase.User) {
+	<form hx-post="auth/resend-email-verification" class="flex flex-col gap-4 text-sm">
+	
+
+
+		<div>An email confirmation link has been sent to: <span class="underline font-medium">{ user.Email }</span></div>
+		
+
+		</form>
+}
+
+
+
+templ SignupForm(values SignupParams, errors validate.Errors) {
+	<form hx-post="/auth/signup" hx-swap="outerHTML" class="py-10 space-y-4 uk-card uk-card-default" hx-trigger="submit">
+		<div class=" uk-card-body w-full rounded-lg">
+			<div class="mb-4">
+				<span class="">Email Address</span>
+			</div>
+			<input { inputAttrs(errors.Has("email"))... } name="email" id="email" value={ values.Email }/>
+			if errors.Has("email") {
+				<div class="text-red-500 text-xs">{ errors.Get("email")[0] }</div>
+			}
+		</div>
+		<div class="mb-4 uk-card-body">
+			<div class="">
+				<span class="">Name</span>
+			</div>
+			<input
+				type="name"
+				required
+				autocomplete="on"
+				placeholder="your name of username"
+				name="name"
+				class="uk-input  w-full"
+			/>
+			if errors.Has("fistName") {
+				<ul>
+					for _, err := range errors.Get("firstName") {
+						<li class="text-red-500 text-xs">{ err }</li>
+					}
+				</ul>
+			}
+		</div>
+		<div class="mb-4 uk-card-body">
+			<div class="">
+				<span class="">Password</span>
+			</div>
+			<input { inputAttrs(errors.Has("password"))... } type="password" name="password" id="password" placeholder="enter password "autocomplete="on"/>
+			if errors.Has("password") {
+				<ul>
+					for _, err := range errors.Get("password") {
+						<li class="text-red-500 text-xs">{ err }</li>
+					}
+				</ul>
+			}
+		</div>
+		<div class="mb-4 uk-card-body">
+			<div class="">
+				<span class="">Confirm Password</span>
+			</div>
+			<input { inputAttrs(errors.Has("passwordConfirm"))... } type="password" name="passwordConfirm" id="passwordConfirm"/>
+			if errors.Has("passwordConfirm") {
+				<div class="text-red-500 text-xs">{ errors.Get("passwordConfirm")[0] }</div>
+			}
+		</div>
+		<button type="submit" class="uk-button uk-button-primary w-full">
+			Sign Up <i class="fa fa-arrow-right" aria-hidden="true"></i>
+		</button>
+		
+		<button type="button" hx-post="/auth/signup/github" class="uk-button uk-button-default w-full">
+			Sign up with GitHub
+		</button>
+
+		<a class="text-sm underline" href="/auth/login">Already have an account? Login here.</a>
+		
+	</form>
+}
+
+
+
+
+
+// Login
+
+type LoginErrors struct {
+	FormErrors validate.Errors
+}
+
+
+templ LoginForm(creds supabase.UserCredentials, errors validate.Errors) {
+	<form hx-post="/auth/login" hx-swap="outerHTML" class="space-y-4" hx-reset-on-success hx-on="htmx:afterRequest: if (event.detail.successful) { location.reload(); }">
+		<div class="w-full">
+			<div class="label">
+				<span class="label-text">Email Address</span>
+			</div>
+			<input { inputAttrs(errors.Has("email"))... } name="email" id="email" value={ creds.Email }/>
+			if errors.Has("email") {
+				<div class="text-red-600 uk-text-small">{ errors.Get("email")[0] } </div>
+
+			}	
+		</div>
+
+		
+		<div class="w-full">
+			<div class="label">
+				<span class="label-text">Password</span>
+			</div>
+				<input { inputAttrs(errors.Has("password"))... } type="password" name="password" id="password"/>
+			if errors.Has("password") {
+				<ul class="list-disc ml-4">
+					for _, err := range errors.Get("password") {
+						<li class="text-red-500 text-xs">password { err }</li>
+					}
+				</ul>
+			}
+		</div>
+		if errors.Has("credentials") {
+				<div class="text-red-500 text-xs">{ errors.Get("credentials")[0] }</div>
+			}
+			if errors.Has("verified") {
+				<div class="text-red-500 text-xs">{ errors.Get("verified")[0] }</div>
+			}
+		<button type="submit" class="uk-button uk-button-primary w-full rounded-lg">
+			Login <i class="fa fa-arrow-right" aria-hidden="true"></i>
+		</button>
+
+		<button type="submit" hx-post="/auth/signup/github" class="uk-button uk-button-default w-full">
+			Login with GitHub <i class="fa fa-arrow-right" aria-hidden="true"></i>
+		</button>
+	</form>
+}
+
+templ CallbackScript() {
+	<script>
+	var url = window.location.href
+	var newUrl = url.replace("#","?")
+	window.location.href = newUrl
+	</script>
+}
+
+
+
+func inputAttrs(hasError bool) templ.Attributes {
+	class := "flex uk-input  w-full px-3 py-2 bg-transparent text-sm border rounded-md ring-offset-background placeholder:text-neutral-500 focus:border-neutral-300 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+	if hasError {
+		class += " border-red-500"
+	} else {
+		class += " border-input"
+	}
+	return templ.Attributes{
+		"class": class,
+	}
+}
+
+templ Toast(msgType string, message string) {
+	<div class="uk-alert uk-alert-{msgType}">
+		
+		<div class="uk-alert-title">{msgType}</div>
+		<div class="uk-alert-description">{message}</div>
+	</div>
+}
+
+templ ToastSuccess(msgType string, message string) {
+
+}
+
+
+
+
+
+
+

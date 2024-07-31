@@ -1,0 +1,93 @@
+package layouts 
+
+
+
+
+import (
+	
+	"github.com/NikoMalik/GoTrack/views/helper"
+    // "github.com/NikoMalik/GoTrack/views/components"
+	"strconv"
+	
+
+)
+
+
+
+templ Pricing(m map[string]interface{}) {
+	@BaseLayout(true) {
+				@helper.MaxWidth("") {
+			<div class="uk-animation-scale-up mt-28 py-20 uk-padding-small flex flex-col items-center justify-center text-center">
+				<div class="text-center mb-20">
+					<h1 class="max-w-3xl text-2xl font-bold md:text-6xl lg:text-7xl">Explore the right plan for your <span class="text-blue-600">business</span>.</h1>
+					<p class="text-center uk-text-lead mt-5 mb-5 uk-text-muted sm:text-lg">Cancel any time, no strings attached.</p>
+				</div>
+			</div>
+
+			<div class="uk-flex uk-flex-center  ">
+				<div class="w-full uk-flex  gap-10 px-10 lg:w-fit lg:flex-row">
+					<div class="uk-card w-full lg:w-80 bg-base-100 shadow-xl relative">
+						<div class="uk-card-body uk-card-default justify-between">
+							<div class="uk-card-title flex flex-col mb-4">
+								<h2 class="uk-card-title text-2xl font-bold">STARTER</h2>
+								<p class="font-bold text-3xl text-primary mb-4">$0</p>
+								<p class="text-base font-semibold">Monitor { convertToString(m["starterDomains"]) } domains</p>
+							</div>
+							<ul class="list-none mb-6 prose text-left">
+								<li><span class="text-green-500 font-bold text-xl">&check;</span> Email notifications</li>
+								<li><span class="text-green-500 font-bold text-xl">&check;</span> Certificate details</li>
+							</ul>
+							<div class="uk-card-body">
+								<a href="/auth/signup" class="uk-button uk-button-default">START FOR FREE</a>
+							</div>
+						</div>
+					</div>
+
+					<div class="uk-card w-full lg:w-80 bg-base-100 shadow-[0_20px_50px_rgba(8,_112,_184,_0.7)] relative">
+						<span class="uk-badge uk-badge-primary absolute top-2 left-2 px-2.5 rounded-full">Best choice</span>
+						<div class="uk-card-body uk-card-secondary justify-between">
+							<div class="uk-card-title flex flex-col mb-4">
+								<h2 class="uk-card-title text-2xl font-bold">BUSINESS</h2>
+								<p class="font-bold text-3xl text-primary mb-2">$10</p>
+								<p class="text-base font-semibold">Monitor up to { convertToString(m["businessDomains"]) } domains</p>
+							</div>
+							<p>Everything in starter plus:</p>
+							<ul class="list-none mb-6 prose">
+								<li><span class="text-green-500 font-bold text-xl">&check;</span> Slack notifications</li>
+								<li><span class="text-green-500 font-bold text-xl">&check;</span> Webhooks</li>
+								<li><span class="text-green-500 font-bold text-xl">&check;</span> Notify 3 email addresses</li>
+							</ul>
+							<div class="uk-card-body justify-center">
+								<form hx-post="/checkout" hx-trigger="submit">
+									<input type="hidden" name="priceID" value="{{ planBusinessPID }}" />
+									<button class="uk-button uk-button-primary">CHOOSE PLAN</button>
+								</form>
+							</div>
+						</div>
+					</div>
+
+					<div class="uk-card w-full lg:w-80 bg-base-100 shadow-xl relative mb-40">
+						<div class="uk-card-body uk-card-primary justify-between">
+							<div class="uk-card-title flex flex-col mb-4">
+								<h2 class="uk-card-title text-2xl font-bold">ENTERPRISE</h2>
+								<p class="font-bold text-3xl mb-2">$50</p>
+								<p class="text-base font-semibold">Monitor { convertToString(m["enterpriseDomains"]) } domains</p>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		}
+	}
+}
+
+func convertToString(i interface{}) string {
+	switch v := i.(type) {
+	case int:
+		return strconv.Itoa(v)
+	case string:
+		return v
+	default:
+		return ""
+	}
+}

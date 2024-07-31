@@ -1,0 +1,130 @@
+package components
+
+
+
+
+import "github.com/NikoMalik/GoTrack/views/helper"
+
+templ Index() {
+    @helper.MaxWidth("") {
+        <div class="uk-animation-slide-bottom  uk-padding-small mx-auto mt-28 mb-4 flex max-w-fit items-center justify-center space-x-2 overflow-hidden rounded-full border border-gray-200 bg-white px-7 py-2 shadow-md backdrop-blur transition-all cursor-pointer">
+            <p class="text-sm font-semibold text-gray-700">
+                <span className=" ">🎉</span>
+                GoTrack is now public!
+            </p>
+        </div>
+        <div class="uk-animation-scale-up  uk-padding-small mb-12 flex flex-col items-center justify-center text-center">
+            <h1 class="max-w-4xl text-5xl font-bold md:text-6xl lg:text-7xl">
+                Track your services 
+                <span class="text-blue-600">friends</span>
+                <span>in</span>
+                <span x-data="{
+                    text: '',
+                    textArray: [' seconds. ', ' nanoseconds. ', ' picoseconds. '],
+                    textIndex: 0,
+                    charIndex: 0,
+                    typeSpeed: 110,
+                    cursorSpeed: 550,
+                    pauseEnd: 1500,
+                    pauseStart: 20,
+                    direction: 'forward',
+                }"
+                x-init="$nextTick(() => {
+                    let typingInterval = setInterval(startTyping, $data.typeSpeed);
+
+                    function startTyping() {
+                        let current = $data.textArray[$data.textIndex];
+
+                        if ($data.charIndex > current.length) {
+                            $data.direction = 'backward';
+                            clearInterval(typingInterval);
+
+                            setTimeout(function() {
+                                typingInterval = setInterval(startTyping, $data.typeSpeed);
+                            }, $data.pauseEnd);
+                        }
+
+                        $data.text = current.substring(0, $data.charIndex);
+
+                        if ($data.direction == 'forward') {
+                            $data.charIndex += 1;
+                        } else {
+                            if ($data.charIndex == 0) {
+                                $data.direction = 'forward';
+                                clearInterval(typingInterval);
+                                setTimeout(function() {
+                                    $data.textIndex += 1;
+                                    if ($data.textIndex >= $data.textArray.length) {
+                                        $data.textIndex = 0;
+                                    }
+                                    typingInterval = setInterval(startTyping, $data.typeSpeed);
+                                }, $data.pauseStart);
+                            }
+                            $data.charIndex -= 1;
+                        }
+                    }
+
+                    setInterval(function() {
+                        if ($refs.cursor.classList.contains('hidden')) {
+                            $refs.cursor.classList.remove('hidden');
+                        } else {
+                            $refs.cursor.classList.add('hidden');
+                        }
+                    }, $data.cursorSpeed);
+
+                })">
+                    <span x-text="text"></span>
+                    // <span class="absolute right-0 w-2 -mr-2 bg-black h-3/4" x-ref="cursor"></span>
+                </span>
+            </h1>
+            <div>
+                <p class="uk-text-lead mt-5 mb-5 max-w-prose uk-text-muted sm:text-lg">
+                    Track all your services with our best solution:
+                    <span class="uk-text-success">
+                        GoTrack - Best for Small Business
+                    </span>
+                </p>
+            </div>
+            <div class="flex space-x-4">
+                <a href="/Pricing" { buttonAttrs()... }>
+                    Go Pricing
+                    <span uk-icon="ratio: 1; icon: chevron-right"/>
+                </a>
+                <a href="/auth/signup" { buttonAttrs2()... }>
+                    Get Started
+                </a>
+            </div>
+
+            <div class="py-20 w-full ">
+                <div class="uk-card uk-card-body rounded-3xl shadow-[0_20px_50px_rgba(8,_112,_184,_0.7)] py-20 mx-auto w-full max-w-full">
+                    <div class="overflow-hidden">
+                        <video src="/static/bask.mp4" class="rounded-3xl w-full h-auto max-w-full" width="1000" height="1000" uk-video="autoplay: inview" loop muted ></video>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+}
+
+func buttonAttrs() templ.Attributes {
+    class := "uk-button uk-button-primary bg-foreground w-40 px-5 "
+    return templ.Attributes{
+        "class": class,
+    }
+}
+
+func buttonAttrs2() templ.Attributes {
+    class := "uk-button uk-button-default rounded-full w-40 px-5"
+    return templ.Attributes{
+        "class": class,
+    }
+}
+
+func ButtonOutline() templ.Attributes {
+    class := "text-primary border border-primary hover:bg-secondary focus:ring-primary"
+
+    return templ.Attributes{
+        "class": class,
+    }
+}
+

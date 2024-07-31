@@ -1,0 +1,24 @@
+package errorsTempl
+
+import ( 
+	"github.com/NikoMalik/GoTrack/views/layouts"
+)
+
+templ Error404() {
+	@layouts.BaseLayout(false) {
+		<div class="uk-animation-fade uk-animation-fast  uk-padding-small h-screen w-full flex flex-col justify-center items-center ">
+			<div class="max-w-4xl text-center">
+				<h1 class="max-w-4xl text-5xl font-bold md:text-6xl lg:text-7xl mb-6 text-blue-600 ">404</h1>
+				
+				<p class="text-lg text-gray-700 mb-6">
+					Sorry, the page you were looking for could not be found. Please check the URL or return to the home page.
+				</p>
+				<a href="/" class="uk-button uk-button-default">
+					Go back home
+				</a>
+			</div>
+		</div>
+	}
+}
+
+

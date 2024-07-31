@@ -1,0 +1,33 @@
+package layouts
+
+import (
+	"github.com/NikoMalik/GoTrack/views/components"
+	
+
+)
+
+var pricing = "/pricing"
+
+templ App() {
+	@BaseLayout(true) {
+        
+		
+            <div class="flex justify-center items-center py-20 mb-20">
+                @components.Index()
+			{ children... }
+            </div>
+
+
+            
+		
+		
+
+
+
+		
+	
+		
+		
+	}
+	
+}

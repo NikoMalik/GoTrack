@@ -1,0 +1,79 @@
+package components
+
+
+import (
+    "github.com/NikoMalik/GoTrack/middleware"
+   
+   
+
+)
+
+
+
+templ Navigation() {
+   
+   
+    
+    <nav   x-data="{mobileMenuOpen: false}" class="  border-neutral-700/30 border-b py-2  w-full overflow-x-auto    ">
+        <div class="container mx-auto flex items-center justify-between">
+            <div class="flex items-center gap-4 space-x-4">
+                <a href="/" class="font-semibold uppercase flex items-center gap-1 py-2">
+                    @ChatIcon()
+                </a>
+            </div>
+            <div class="flex items-center gap-6">
+              
+                    <a href="/pricing" class="font-semibold py-2 duration-300  hover:text-foreground/50 rounded-lg text-foreground ">
+                        Pricing
+                    </a>
+
+
+                    <a href="/about" class="font-semibold py-2  duration-300   hover:text-foreground/50 rounded-lg text-foreground">
+                        About
+                    </a>
+                    <ul class="">
+                    
+				 if middleware.GetAuthenticatedUser().LoggedIn {
+                        <nav>
+                            <details>
+                                <summary>
+                                    { middleware.GetAuthenticatedUser().Email }
+                                </summary>
+                                <ul class="p-2 bg-base-100 rounded-t-none">
+                                    <li><a href="/auth/logout">Logout</a></li>
+                                    <li><a href="/settings">Settings</a></li>
+                                </ul>
+                            </details>
+                        </nav>
+                    } else {
+                        
+                        <a href="/auth/signup" { buttonNav()... }>
+                           Signup for Free 
+                        </a>
+                    }
+                </ul>
+                @ThemeSwitcher()
+            </div>
+        </div>
+    </nav>
+}
+
+
+
+templ ChatIcon() {
+	<img src="/static/logo.svg" width="30" height="30" uk-svg />
+}
+
+func buttonNav() templ.Attributes {
+    class := "uk-button uk-button-secondary text-white   focus:ring-primary  rounded-full w-40 px-5"
+    return templ.Attributes{
+        "class": class,
+    }
+}
+
+func buttonNavPrimary() templ.Attributes {
+    class := "uk-button uk-button-primary    focus:ring-primary  rounded-full w-40 px-5"
+    return templ.Attributes{
+        "class": class,
+    }
+}
