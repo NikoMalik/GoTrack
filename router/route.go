@@ -4,6 +4,7 @@ import (
 	"log"
 
 	"github.com/NikoMalik/GoTrack/handlers"
+	"github.com/NikoMalik/GoTrack/middleware"
 	"github.com/NikoMalik/GoTrack/routes/authRouter"
 	"github.com/gofiber/contrib/websocket"
 	"github.com/gofiber/fiber/v2"
@@ -14,6 +15,7 @@ func Setup(app *fiber.App) {
 
 	app.Get("/", handlers.HandleGetHome)
 	app.Get("/pricing", handlers.HandlePricing)
+	app.Get("/dashboard", middleware.IfUserNotAuth, handlers.HandleGetDashboard)
 
 	//auth routes
 

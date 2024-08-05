@@ -3,6 +3,8 @@ package components
 
 import (
     "github.com/NikoMalik/GoTrack/middleware"
+     
+
    
    
 
@@ -11,53 +13,72 @@ import (
 
 
 templ Navigation() {
-   
+
    
     
-    <nav   x-data="{mobileMenuOpen: false}" class="  border-neutral-700/30 border-b py-2  w-full overflow-x-auto    ">
-        <div class="container mx-auto flex items-center justify-between">
-            <div class="flex items-center gap-4 space-x-4">
-                <a href="/" class="font-semibold uppercase flex items-center gap-1 py-2">
-                    @ChatIcon()
-                </a>
-            </div>
-            <div class="flex items-center gap-6">
-              
-                    <a href="/pricing" class="font-semibold py-2 duration-300  hover:text-foreground/50 rounded-lg text-foreground ">
-                        Pricing
+  
+           <nav x-data="{ mobileMenuOpen: false, userDropdownOpen: false }" @click.away="mobileMenuOpen = false, userDropdownOpen = false" 
+           class="border-neutral-700/30 border-b flex items-center  h-14   w-full   transition-all">
+           
+            <div class="container mx-auto flex items-center justify-between">
+                <div class="items-center gap-4 sm:flex">
+                    <a href="/" class="font-semibold uppercase flex items-center gap-1 py-2">
+                        @ChatIcon()
                     </a>
-
-
-                    <a href="/about" class="font-semibold py-2  duration-300   hover:text-foreground/50 rounded-lg text-foreground">
-                        About
-                    </a>
-                    <ul class="">
-                    
-				 if middleware.GetAuthenticatedUser().LoggedIn {
-                        <nav>
-                            <details>
-                                <summary>
-                                    { middleware.GetAuthenticatedUser().Email }
-                                </summary>
-                                <ul class="p-2 bg-base-100 rounded-t-none">
-                                    <li><a href="/auth/logout">Logout</a></li>
-                                    <li><a href="/settings">Settings</a></li>
-                                </ul>
-                            </details>
-                        </nav>
-                    } else {
-                        
-                        <a href="/auth/signup" { buttonNav()... }>
-                           Signup for Free 
+                </div>
+                <div class="flex items-center gap-6">
+        
+                        <a href="/pricing" class="font-semibold py-2 duration-300  hover:text-foreground/50 rounded-lg text-foreground ">
+                            Pricing
                         </a>
-                    }
-                </ul>
-                @ThemeSwitcher()
+                        <a href="/about" class="font-semibold py-2  duration-300   hover:text-foreground/50 rounded-lg text-foreground">
+                            About
+                        </a>
+                        <ul class="flex items-center space-x-4">
+                        
+                         if middleware.GetAuthenticatedUser().LoggedIn {
+                            
+                         @ProfilePage()
+        
+                            
+                        } else {
+        
+                            <a href="/auth/signup" { buttonNav()... }>
+                               Signup for Free
+                            </a>
+                        }
+                    </ul>
+                    @ThemeSwitcher()
+                </div>
             </div>
-        </div>
-    </nav>
+        </nav>
+    
 }
 
+templ ProfilePage() {
+   <div x-data="{ isOpened: false, openedWithKeyboard: false }" @keydown.esc.window="isOpened = false, openedWithKeyboard = false" class="">
+    <!-- Toggle Button -->
+    <button type="button" @click="isOpened = ! isOpened" @keydown.space.prevent="openedWithKeyboard = true" @keydown.enter.prevent="openedWithKeyboard = true" @keydown.down.prevent="openedWithKeyboard = true" class="uk-button uk-button-default   rounded-2xl  inline-flex cursor-pointer items-center gap-2 whitespace-nowrap border border-[var(--border)] bg-[var(--bg)] px-4 py-2 text-sm font-medium tracking-wide transition hover:opacity-75 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--outline)] dark:border-[var(--dark-border)] dark:bg-[var(--dark-bg)] dark:focus-visible:outline-[var(--dark-outline)]" :class="isOpened || openedWithKeyboard ? 'bg-[var(--active-bg)] dark:bg-[var(--active-dark-bg)] text-[var(--active-text)] dark:text-[var(--active-dark-text)]' : 'bg-[var(--bg)] dark:bg-[var(--dark-bg)] text-[var(--text)] dark:text-[var(--dark-text)]'" :aria-expanded="isOpened || openedWithKeyboard" aria-haspopup="true">
+          <span class="mr-2">{ middleware.GetAuthenticatedUser().Name }</span>
+        <span class="uk-margin-small-left" uk-drop-parent-icon></span> 
+    </button>
+    <!-- Dropdown Menu -->
+    <div x-cloak x-show="isOpened || openedWithKeyboard" x-transition x-trap="openedWithKeyboard" @click.outside="isOpened = false, openedWithKeyboard = false" @keydown.down.prevent="$focus.wrap().next()" @keydown.up.prevent="$focus.wrap().previous()" class="uk-card uk-card-default absolute top-11 flex w-96  flex-col divide-y divide-[var(--divide)] overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--bg)] dark:divide-[var(--dark-divide)] dark:border-[var(--dark-border)] dark:bg-[var(--dark-bg)]" role="menu">
+        <div class="flex flex-col py-1.5 uk-card-body"> 
+            <a href="/dashboard" class="bg-[var(--bg)] px-4 py-2 text-sm text-[var(--text)] hover:bg-[var(--hover-bg)]/5 hover:text-[var(--hover-text)] focus-visible:bg-[var(--hover-bg)]/10 focus-visible:text-[var(--hover-text)] focus-visible:outline-none dark:bg-[var(--dark-bg)] dark:text-[var(--dark-text)] dark:hover:bg-[var(--dark-hover-bg)]/5 dark:hover:text-[var(--dark-hover-text)] dark:focus-visible:bg-[var(--dark-hover-bg)]/10 dark:focus-visible:text-[var(--dark-hover-text)] text-left " role="menuitem">Dashboard</a>
+            <a href="#" class="bg-[var(--bg)] px-4 py-2 text-sm text-[var(--text)] hover:bg-[var(--hover-bg)]/5 hover:text-[var(--hover-text)] focus-visible:bg-[var(--hover-bg)]/10 focus-visible:text-[var(--hover-text)] focus-visible:outline-none dark:bg-[var(--dark-bg)] dark:text-[var(--dark-text)] dark:hover:bg-[var(--dark-hover-bg)]/5 dark:hover:text-[var(--dark-hover-text)] dark:focus-visible:bg-[var(--dark-hover-bg)]/10 dark:focus-visible:text-[var(--dark-hover-text)]" role="menuitem">Messages</a>
+            <a href="#" class="bg-[var(--bg)] px-4 py-2 text-sm text-[var(--text)] hover:bg-[var(--hover-bg)]/5 hover:text-[var(--hover-text)] focus-visible:bg-[var(--hover-bg)]/10 focus-visible:text-[var(--hover-text)] focus-visible:outline-none dark:bg-[var(--dark-bg)] dark:text-[var(--dark-text)] dark:hover:bg-[var(--dark-hover-bg)]/5 dark:hover:text-[var(--dark-hover-text)] dark:focus-visible:bg-[var(--dark-hover-bg)]/10 dark:focus-visible:text-[var(--dark-hover-text)]" role="menuitem">Favorites</a>
+        </div>
+        <div class="flex flex-col py-1.5 uk-card-footer"> 
+            <a href="#" class="bg-[var(--bg)] px-4 py-2 text-sm text-[var(--text)] hover:bg-[var(--hover-bg)]/5 hover:text-[var(--hover-text)] focus-visible:bg-[var(--hover-bg)]/10 focus-visible:text-[var(--hover-text)] focus-visible:outline-none dark:bg-[var(--dark-bg)] dark:text-[var(--dark-text)] dark:hover:bg-[var(--dark-hover-bg)]/5 dark:hover:text-[var(--dark-hover-text)] dark:focus-visible:bg-[var(--dark-hover-bg)]/10 dark:focus-visible:text-[var(--dark-hover-text)]" role="menuitem">Profile</a>
+            <a href="#" class="bg-[var(--bg)] px-4 py-2 text-sm text-[var(--text)] hover:bg-[var(--hover-bg)]/5 hover:text-[var(--hover-text)] focus-visible:bg-[var(--hover-bg)]/10 focus-visible:text-[var(--hover-text)] focus-visible:outline-none dark:bg-[var(--dark-bg)] dark:text-[var(--dark-text)] dark:hover:bg-[var(--dark-hover-bg)]/5 dark:hover:text-[var(--dark-hover-text)] dark:focus-visible:bg-[var(--dark-hover-bg)]/10 dark:focus-visible:text-[var(--dark-hover-text)]" role="menuitem">Settings</a>
+        </div>
+        <div class="flex flex-col py-1.5 uk-card-footer"> 
+            <a href="/auth/logout" class="bg-[var(--bg)] px-4 py-2 text-sm text-[var(--text)] hover:bg-[var(--hover-bg)]/5 hover:text-[var(--hover-text)] focus-visible:bg-[var(--hover-bg)]/10 focus-visible:text-[var(--hover-text)] focus-visible:outline-none dark:bg-[var(--dark-bg)] dark:text-[var(--dark-text)] dark:hover:bg-[var(--dark-hover-bg)]/5 dark:hover:text-[var(--dark-hover-text)] dark:focus-visible:bg-[var(--dark-hover-bg)]/10 dark:focus-visible:text-[var(--dark-hover-text)]" role="menuitem">LogOut</a>
+        </div>
+    </div> 
+</div>
+}
 
 
 templ ChatIcon() {

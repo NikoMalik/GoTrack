@@ -8,25 +8,31 @@ import (
 )
 
 func HandleGetHome(c *fiber.Ctx) error {
-	// accessToken := c.Query("access_Token")
-	// if len(accessToken) == 0 {
-	// 	Render(c, layouts.CallbackScript())
-	// 	log.Println("no access token")
-	// 	return c.Redirect("/auth/callback/" + accessToken)
-	// }
 
-	// if len(accessToken) > 0 {
+	if cookie := c.Cookies("visited"); cookie == "" {
 
-	// 	setAuthCookie(c, accessToken)
+		c.Cookie(&fiber.Cookie{
+			Name:  "visited",
+			Value: "true",
+		})
 
-	// }
+	}
 
-	if err := Render(c, layouts.App()); err != nil {
+	if err := Render(c, layouts.Index(c)); err != nil {
 		return err
 	}
 
 	return nil
 
+}
+
+func HandleGetDashboard(c *fiber.Ctx) error {
+
+	if err := Render(c, layouts.Dashboard(c, data)); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func HandlePricing(c *fiber.Ctx) error {
@@ -39,7 +45,7 @@ func HandlePricing(c *fiber.Ctx) error {
 		"enterpriseDomains": 500,
 	}
 
-	if err := Render(c, layouts.Pricing(context)); err != nil {
+	if err := Render(c, layouts.Pricing(context, c)); err != nil {
 		return err
 	}
 
@@ -50,7 +56,7 @@ func HandlePricing(c *fiber.Ctx) error {
 func HandleGetSignup(c *fiber.Ctx) error {
 	// Создаем пустые значения формы и ошибки
 
-	if err := Render(c, layouts.SignupIndex()); err != nil {
+	if err := Render(c, layouts.SignupIndex(c)); err != nil {
 		return err
 	}
 
@@ -58,7 +64,7 @@ func HandleGetSignup(c *fiber.Ctx) error {
 }
 
 func HandleGetLogin(c *fiber.Ctx) error {
-	if err := Render(c, layouts.LoginIndex()); err != nil {
+	if err := Render(c, layouts.LoginIndex(c)); err != nil {
 		return err
 	}
 	return nil

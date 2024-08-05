@@ -2,7 +2,9 @@
   "dependencies": {
     "@tailwindcss/forms": "^0.5.7",
     "@tailwindcss/typography": "^0.5.13",
+   
     "franken-ui": "^0.1.0",
+    "npm": "^10.8.2",
     "postcss": "^8.4.39"
   }
 }

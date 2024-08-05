@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -12,6 +11,8 @@ import (
 	"time"
 
 	"github.com/NikoMalik/GoTrack/db"
+	"github.com/NikoMalik/GoTrack/goaster"
+	"github.com/NikoMalik/GoTrack/handlers"
 	"github.com/NikoMalik/GoTrack/logEvent"
 	"github.com/NikoMalik/GoTrack/middleware"
 	"github.com/NikoMalik/GoTrack/sb"
@@ -24,18 +25,11 @@ import (
 	"github.com/joho/godotenv"
 )
 
-// var store = session.New()
-// var preferenceMap map[string]string
-
 type Client struct {
 	*websocket.Conn
 }
 
 var wsClient Client
-
-// const goTrackVersion = "1.0.0"
-// const maxWorkerPoolSize = 5
-// const maxJobMaxWorkers = 5
 
 var app = fiber.New(fiber.Config{
 
@@ -43,26 +37,7 @@ var app = fiber.New(fiber.Config{
 	JSONDecoder: json.Unmarshal,
 
 	// Override default error handler
-	ErrorHandler: func(ctx *fiber.Ctx, err error) error {
-		// Status code defaults to 500
-		code := fiber.StatusInternalServerError
-
-		// Retrieve the custom status code if it's a *fiber.Error
-		var e *fiber.Error
-		if errors.As(err, &e) {
-			code = e.Code
-		}
-
-		// Send custom error page
-		err = ctx.Status(code).SendFile(fmt.Sprintf("./%d.html", code))
-		if err != nil {
-			// In case the SendFile fails
-			return ctx.Status(fiber.StatusInternalServerError).SendString("Internal Server Error")
-		}
-
-		// Return from handler
-		return nil
-	},
+	ErrorHandler: handlers.ErrorHandler,
 })
 
 func main() {
@@ -72,6 +47,9 @@ func main() {
 			debug.PrintStack()
 		}
 	}()
+
+	app.Use(middleware.WithAuthUser)
+
 	initEverything()
 	app.Static("static", "./static", fiber.Static{
 		Compress:      true,
@@ -80,12 +58,6 @@ func main() {
 
 	app.Use(logger.New())
 
-	// app.Use(jwtware.New(jwtware.Config{
-	// 	SigningKey: jwtware.SigningKey{
-	// 		JWTAlg: jwtware.RS256,
-	// 		Key:    []byte(os.Getenv("JWT_SECRET_KEY")),
-	// 	},
-	// }))
 	app.Use(limiter.New(limiter.Config{
 		Max:        10,
 		Expiration: 1 * time.Minute,
@@ -94,16 +66,8 @@ func main() {
 		},
 	}))
 
-	app.Use(middleware.WithAuthUser)
+	// app.Use(middleware.WithAuthenticatedUser)
 
-	// app.Use(func(c *fiber.Ctx) error {
-	// 	c.Set("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate")
-	// 	c.Set("Pragma", "no-cache")
-	// 	c.Set("Expires", "0")
-	// 	c.Set("Surrogate-Control", "no-store")
-	// 	return c.Next()
-	// })
-	// Set up routes
 	router.Setup(app)
 
 	go func() {
@@ -117,7 +81,6 @@ func main() {
 		}
 	}()
 
-	// Start the server
 	log.Fatal(app.Listen(":8000"))
 }
 
@@ -128,6 +91,8 @@ func initEverything() error {
 	}
 	sb.Init()
 	db.Init()
+	goaster.Init()
+
 	defer db.Bun.Close()
 	logEvent.Init("GO_TRACK_LOG")
 	return nil

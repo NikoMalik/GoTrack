@@ -1,0 +1,28 @@
+package components
+
+
+
+templ Cookie(t bool) {
+    <div class="z-50 overflow-hidden   uk-flex max-w-sm flex-col justify-end uk-card uk-card-default fixed bottom-0 right-0 w-96 h-auto gap-4 border-slate-300  text-slate-700   dark:text-slate-300 rounded-xl border" hx-trigger="submit" hx-swap="outerHTML">
+    <!-- Header -->
+    <div class="flex items-center justify-between uk-card-header border-b border-slate-300  px-4 py-2 dark:border-slate-700 ">
+        <h3 class="flex items-center gap-2 font-semibold text-foreground">
+            <span class="text-3xl" aria-hidden="true">🍪</span>
+            Cookie Time!
+        </h3>
+    </div>
+
+    <!-- Body -->
+    <div class="px-4 text-sm uk-card-body">
+        <p class="text-pretty">
+            We use cookies to make your experience sweet and crispy. For more information, please read our <a href="#" class="cursor-pointer font-medium text-blue-700 underline-offset-2 hover:underline focus:underline focus:outline-none dark:text-blue-600">Privacy Policy</a>
+        </p>
+    </div>
+
+        <!-- Footer -->
+        <div class="flex flex-col-reverse uk-card-footer justify-end gap-2 border-t border-slate-300  px-4 py-2 sm:flex-row sm:items-center dark:border-slate-700  rounded-b-xl">
+            <button type="submit" class="uk-button uk-button-default cursor-pointer whitespace-nowrap p-2 text-center text-xs font-medium tracking-wide text-slate-700 transition hover:opacity-75 focus-visible:slate-300 focus-visible:outline-2 focus-visible:outline-offset-2  active:outline-offset-0 rounded-xl">No, thank you</button>
+            <button type="submit" class="uk-button uk-button-primary cursor-pointer whitespace-nowrap  px-4 py-2 text-center text-xs font-medium tracking-wide text-slate-100 transition hover:opacity-75 focus-visible:slate-300 focus-visible:outline-2 focus-visible:outline-offset-2  active:opacity-100 active:outline-offset-0  rounded-xl">Sounds Good!</button>
+        </div>
+    </div>
+}

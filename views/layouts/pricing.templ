@@ -8,14 +8,16 @@ import (
 	"github.com/NikoMalik/GoTrack/views/helper"
     // "github.com/NikoMalik/GoTrack/views/components"
 	"strconv"
+	"github.com/gofiber/fiber/v2"
+	 
 	
 
 )
 
 
 
-templ Pricing(m map[string]interface{}) {
-	@BaseLayout(true) {
+templ Pricing(m map[string]interface{}, c *fiber.Ctx) {
+	@BaseLayout(true, c) {
 				@helper.MaxWidth("") {
 			<div class="uk-animation-scale-up mt-28 py-20 uk-padding-small flex flex-col items-center justify-center text-center">
 				<div class="text-center mb-20">

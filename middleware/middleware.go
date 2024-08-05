@@ -3,16 +3,16 @@ package middleware
 import (
 	"log"
 	"strings"
-	"sync"
+	"sync/atomic"
 
 	"github.com/NikoMalik/GoTrack/data"
+	"github.com/NikoMalik/GoTrack/logEvent"
 	"github.com/NikoMalik/GoTrack/sb"
 	"github.com/gofiber/fiber/v2"
 )
 
 var (
-	authenticatedUser *data.AuthenticatedUser // auth userModel &
-	mu                sync.RWMutex            // mutex for escape data race
+	authenticatedUser atomic.Value // auth userModel &
 )
 
 // WithAuthUser is a middleware that checks for a valid user in the "access_Token" cookie.
@@ -21,40 +21,45 @@ func WithAuthUser(c *fiber.Ctx) error {
 	if strings.Contains(c.Path(), "/static") {
 		return c.Next()
 	}
+	log.Println("with auth user")
 
 	// Get the cookie "access_Token"
 	cookie := c.Cookies("access_Token")
 	if cookie == "" {
+
 		clearAuthenticatedUser()
+		return c.Next()
+	}
+
+	if len(c.Cookies("access_Token")) == 0 {
 		return c.Next()
 	}
 
 	// Verify user through Supabase
 	resp, err := sb.Client.Auth.User(c.Context(), cookie)
 	if err != nil {
+		logEvent.Log("error", "authentication error", "err", "probably invalid access token")
+		c.ClearCookie("access_Token")
+
 		clearAuthenticatedUser()
-		return c.Next()
+		return c.Redirect("/")
+
+	}
+
+	name := ""
+	if n, ok := resp.UserMetadata["Name"].(string); ok {
+		name = n
+	} else if u, ok := resp.UserMetadata["user_name"].(string); ok {
+		name = u
 	}
 
 	// Initialize user information
 	user := &data.AuthenticatedUser{
 		LoggedIn: true,
+		Email:    resp.Email,
+		Name:     name,
 	}
 
-	// Safe extraction of Name from UserMetadata
-	if name, ok := resp.UserMetadata["Name"].(string); ok {
-		user.Name = name
-	} else {
-		// Handle the case where Name is not a string or is missing
-		user.Name = "Unknown"
-	}
-
-	// Extract Email safely
-	user.Email = resp.Email
-
-	log.Println("User authenticated:", user.Email)
-
-	// Store user in context and package-level variable
 	c.Locals("user", user)
 	setAuthenticatedUser(user)
 
@@ -64,21 +69,55 @@ func WithAuthUser(c *fiber.Ctx) error {
 
 // setAuthenticatedUser safely sets the authenticated user
 func setAuthenticatedUser(user *data.AuthenticatedUser) {
-	mu.Lock()
-	defer mu.Unlock()
-	authenticatedUser = user
+	authenticatedUser.Store(user)
 }
 
 // clearAuthenticatedUser safely clears the authenticated user
 func clearAuthenticatedUser() {
-	mu.Lock()
-	defer mu.Unlock()
-	authenticatedUser = &data.AuthenticatedUser{}
+	authenticatedUser.Store(&data.AuthenticatedUser{})
 }
 
 // GetAuthenticatedUser safely retrieves the authenticated user
 func GetAuthenticatedUser() *data.AuthenticatedUser {
-	mu.RLock()
-	defer mu.RUnlock()
-	return authenticatedUser
+	if user, ok := authenticatedUser.Load().(*data.AuthenticatedUser); ok {
+		return user
+	}
+	return &data.AuthenticatedUser{}
+}
+
+func WithAuthenticatedUser(c *fiber.Ctx) error {
+	user := &data.AuthenticatedUser{}
+	c.Locals("user", user)
+
+	if len(c.Cookies("access_Token")) == 0 {
+		return c.Next()
+	}
+
+	_, err := sb.Client.Auth.User(c.Context(), c.Cookies("access_Token"))
+	if err != nil {
+		logEvent.Log("error", "authentication error", "err", "probably invalid access token")
+		c.ClearCookie("access_Token")
+
+		return c.Redirect("/")
+	}
+
+	ourUser := &data.AuthenticatedUser{ID: user.ID, Email: user.Email}
+	logEvent.Log("msg", "user authenticated", "email", ourUser.Email)
+	c.Locals("user", ourUser)
+
+	return c.Next()
+}
+
+func IfUserAuth(c *fiber.Ctx) error {
+	if GetAuthenticatedUser().LoggedIn == true {
+		return c.Redirect("/")
+	}
+	return c.Next()
+}
+
+func IfUserNotAuth(c *fiber.Ctx) error {
+	if GetAuthenticatedUser().LoggedIn == false {
+		return c.Redirect("/")
+	}
+	return c.Next()
 }

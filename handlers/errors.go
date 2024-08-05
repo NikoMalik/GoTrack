@@ -23,7 +23,7 @@ func AppError(err error) Error {
 
 // Handle404 handles 404 errors by rendering the 404 error template.
 func Handle404(c *fiber.Ctx) error {
-	if err := Render(c, errorsTempl.Error404()); err != nil {
+	if err := Render(c, errorsTempl.Error404(c)); err != nil {
 		return err
 	}
 	return nil
@@ -31,7 +31,7 @@ func Handle404(c *fiber.Ctx) error {
 
 // Handle500 handles 500 errors by rendering the 500 error template.
 func Handle500(c *fiber.Ctx) error {
-	if err := Render(c, errorsTempl.Error500()); err != nil {
+	if err := Render(c, errorsTempl.Error500(c)); err != nil {
 		return err
 	}
 	return nil

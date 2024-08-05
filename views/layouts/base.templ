@@ -1,7 +1,13 @@
 package layouts
 
 
-import "github.com/NikoMalik/GoTrack/views/components"
+import ( 
+	"github.com/NikoMalik/GoTrack/views/components"
+	 "github.com/NikoMalik/GoTrack/goaster"
+	 "github.com/gofiber/fiber/v2"
+	
+	 
+)
 
 var (
 	title = "GoTrack"
@@ -10,43 +16,55 @@ var (
 
 
 
-templ BaseLayout(nav bool) {
+templ BaseLayout(nav bool, c *fiber.Ctx) {
 	
 	<html lang="en" class="scroll-smooth">
 		<head>
 			<title>{ title }</title>
 
 			<link rel="icon" type="image/x-icon" href="/static/logo.svg"/>
+			
 
             
 
 			<meta charset="UTF-8"/>
 			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 			  <link rel="stylesheet"  href="/static/css/styles.css"/>
+
+			 
 	
 
 <script src="https://cdn.jsdelivr.net/npm/uikit@3.21.6/dist/js/uikit.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/uikit@3.21.6/dist/js/uikit-icons.min.js"></script>
 
+
 			  
 			  
+			
 
  
 			
 			
-			<!-- Alpine Plugins -->
+			// <!-- Alpine Plugins -->
 			<script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/focus@3.x.x/dist/cdn.min.js"></script>
 			<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+			
+
+
 		
 
 			<!-- HTMX -->
  <script src="https://unpkg.com/htmx.org@1.9.10"
   
    ></script>
+   	@goaster.GoasterCSS()
+
+   
 	
 	
 
 <!-- Custom Scripts -->
+		
     <script>
       
         const hash = window.location.hash;
@@ -70,6 +88,23 @@ templ BaseLayout(nav bool) {
 
 		</head>
 		<body x-data="{theme: 'dark'}" :class="theme " lang="en" class="no-scrollbar  w-full overflow-auto lg:scrollbar  antialiased "  >
+		if cookie := c.Cookies("visited"); cookie == "" {
+				
+					@components.Cookie(true)
+				
+			}
+		
+
+
+
+		
+
+		
+	
+
+			
+			
+		
 		if nav {
 				@components.Navigation()
 			}

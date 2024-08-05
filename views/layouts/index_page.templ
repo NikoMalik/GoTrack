@@ -1,11 +1,17 @@
-package components
+package layouts 
 
 
+import ( 
+    "github.com/NikoMalik/GoTrack/views/helper"
+    "github.com/gofiber/fiber/v2"
+    
+   
+    
 
+)
 
-import "github.com/NikoMalik/GoTrack/views/helper"
-
-templ Index() {
+templ Index(c *fiber.Ctx) {
+    @BaseLayout(true, c) {
     @helper.MaxWidth("") {
         <div class="uk-animation-slide-bottom  uk-padding-small mx-auto mt-28 mb-4 flex max-w-fit items-center justify-center space-x-2 overflow-hidden rounded-full border border-gray-200 bg-white px-7 py-2 shadow-md backdrop-blur transition-all cursor-pointer">
             <p class="text-sm font-semibold text-gray-700">
@@ -85,29 +91,73 @@ templ Index() {
                     </span>
                 </p>
             </div>
-            <div class="flex space-x-4">
+            
+            <div class="flex space-x-4 uk-inline">
+            
+             
                 <a href="/Pricing" { buttonAttrs()... }>
                     Go Pricing
                     <span uk-icon="ratio: 1; icon: chevron-right"/>
                 </a>
+                
                 <a href="/auth/signup" { buttonAttrs2()... }>
                     Get Started
                 </a>
+            
+                
+          
+           
             </div>
 
-            <div class="py-20 w-full ">
-                <div class="uk-card uk-card-body rounded-3xl shadow-[0_20px_50px_rgba(8,_112,_184,_0.7)] py-20 mx-auto w-full max-w-full">
-                    <div class="overflow-hidden">
-                        <video src="/static/bask.mp4" class="rounded-3xl w-full h-auto max-w-full" width="1000" height="1000" uk-video="autoplay: inview" loop muted ></video>
+
+            
+
+            <div class="py-20 w-full z-0 ">
+                <div class="uk-card  uk-card-body rounded-3xl shadow-[0_20px_50px_rgba(8,_112,_184,_0.7)] py-20 mx-auto w-full max-w-full">
+                    <div class="">
+                        <video src="/static/bask.mp4" class="rounded-3xl w-full h-auto max-w-full" width="1000" height="1000" uk-video="autoplay: inview" 
+                        playsinline
+                        loop 
+                        muted ></video>
                     </div>
                 </div>
+                  
             </div>
-        </div>
+            </div>
+
+
+            
+
+
+
+           <div class="py-24 sm:py-32 mb-20">
+  <div class="mx-auto max-w-7xl px-6 lg:px-8">
+    <h2 class="text-center uk-text-muted font-semibold leading-8 text-2xl">Trusted by the world’s most innovative teams</h2>
+    <div class="mt-8 flex flex-wrap items-center justify-center gap-10 gap-y-8 lg:gap-1">
+      <img class="max-h-4 w-full object-contain filter-foreground " src="https://tailwindui.com/img/logos/158x48/transistor-logo-gray-900.svg" alt="Transistor" width="10" height="10">
+      <img class="max-h-4 w-full object-contain" src="https://tailwindui.com/img/logos/158x48/reform-logo-gray-900.svg" alt="Reform" width="158" height="48" >
+      <img class="max-h-4 w-full object-contain" src="https://tailwindui.com/img/logos/158x48/tuple-logo-gray-900.svg" alt="Tuple" width="158" height="48">
+   
+      <img class="max-h-4 w-full object-contain" src="https://tailwindui.com/img/logos/158x48/savvycal-logo-gray-900.svg" alt="SavvyCal" width="158" height="48">
+      <img class="h- w-full object-contain" src="https://tailwindui.com/img/logos/158x48/statamic-logo-gray-900.svg" alt="Statamic" width="158" height="48">
+     
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
     }
+
+          
+}
 }
 
 func buttonAttrs() templ.Attributes {
-    class := "uk-button uk-button-primary bg-foreground w-40 px-5 "
+    class := "uk-button uk-button-primary bg-foreground w-40 px-5  "
     return templ.Attributes{
         "class": class,
     }

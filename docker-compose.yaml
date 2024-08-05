@@ -5,23 +5,29 @@ services:
 
 
 
-  db:
-    container_name: db
-    image: postgres:13.15
-    restart: always
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: postgres
-    ports:
-      - "5432:5432"
-    volumes:
-      - pgdata:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -q -d postgres -U postgres"]
-      timeout: 45s
-      interval: 10s
-      retries: 10
+  # db:
+  #   container_name: db
+  #   image: postgres:13.15
+  #   restart: always
+  #   # environment:
+  #   #   POSTGRES_USER: postgres
+  #   #   POSTGRES_PASSWORD: postgres
+  #   #   POSTGRES_DB: postgres
+  #   # ports:
+  #   #   - "5432:5432"
+  #   # volumes:
+  #   #   - pgdata:/var/lib/postgresql/data
+  #   # healthcheck:
+  #   #   test: ["CMD-SHELL", "pg_isready -q -d postgres -U postgres"]
+  #   #   timeout: 45s
+  #   #   interval: 10s
+  #   #   retries: 10
+   stripe-cli:
+    image: stripe/stripe-cli:latest
+    container_name: stripe-cli
+    command: "listen --api-key {  YOUR API KEY } --device-name name  --forward-to { YOUR INGESTION URL } --skip-verify " # EXAMPLE ost.docker.internal:8000/api/webhook
+
+
 
 volumes:
   pgdata: {}

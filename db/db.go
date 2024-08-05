@@ -36,7 +36,6 @@ func Init() {
 		// Create a new Bun instance with PostgreSQL dialect
 		Bun = bun.NewDB(sqldb, pgdialect.New())
 
-		// Add verbose logging if needed
 		verbose := false
 		if verbose {
 			Bun.AddQueryHook(bundebug.NewQueryHook(bundebug.WithVerbose(true)))

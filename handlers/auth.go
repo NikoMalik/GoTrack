@@ -10,8 +10,10 @@ import (
 	"github.com/NikoMalik/GoTrack/data"
 	"github.com/NikoMalik/GoTrack/db"
 	"github.com/NikoMalik/GoTrack/event"
+	"github.com/NikoMalik/GoTrack/goaster"
 	"github.com/NikoMalik/GoTrack/logEvent"
 	"github.com/NikoMalik/GoTrack/sb"
+
 	v "github.com/NikoMalik/GoTrack/validate"
 	"github.com/golang-jwt/jwt/v5"
 
@@ -88,7 +90,7 @@ func HandleLoginWithEmail(c *fiber.Ctx) error {
 		Password: c.FormValue("password"),
 	}
 
-	log.Printf("Received params: %+v", &params)
+	logEvent.Log("msg", "user login with email", "email", params.Email)
 
 	errors, ok := v.Request(c.Context(), &params, authSchema)
 
@@ -105,13 +107,13 @@ func HandleLoginWithEmail(c *fiber.Ctx) error {
 	if err != nil {
 		log.Printf("Login error: %v", err)
 		if err.Error() == "invalid_grant: Email not confirmed" {
-			return Render(c, layouts.Toast("Login Error", "Please confirm your email address before logging in."))
+			return Render(c, layouts.Toast("sent", goaster.Goaster, "Please confirm your email address before logging in."))
 		}
 
-		return Render(c, layouts.Toast("Login Error", "Please check your credentials and try again."))
+		return Render(c, layouts.Toast("Login Error", goaster.Goaster, "Please check your credentials and try again."))
 	}
 
-	if c.Query("access_Token") == "" {
+	if c.Cookies("access_Token") == "" {
 
 		setAuthCookie(c, resp.AccessToken)
 	}
@@ -130,21 +132,17 @@ func setAuthCookie(c *fiber.Ctx, accessToken string) {
 		Secure:   true,
 		HTTPOnly: true,
 		SameSite: "Strict",
+		Expires:  time.Now().Add(336 * time.Hour).UTC(),
 	})
 }
 
 func HandleResendVerificationCode(c *fiber.Ctx) error {
 	id := c.Params("ID")
 
-	var user data.User
+	var user *supabase.User
 
 	if err := db.Bun.NewSelect().Model(&user).Where("id = ?", id).Scan(context.Background()); err != nil {
 		return err
-	}
-
-	if user.EmailVerifiedAt.Time.After(time.Time{}) {
-		return logEvent.Log("msg", "user already verified", "id", user.ID)
-
 	}
 
 	token, err := createVerificationToken(c, id)
@@ -217,11 +215,17 @@ func HandleSignInWithGithub(c *fiber.Ctx) error {
 
 func HandleGetSignOut(c *fiber.Ctx) error {
 
-	if err := sb.Client.Auth.SignOut(c.Context(), c.Cookies("accessToken")); err != nil {
+	if err := sb.Client.Auth.SignOut(c.Context(), c.Cookies("access_Token")); err != nil {
 		return err
 	}
 
 	c.ClearCookie("access_Token")
+
+	if c.Cookies("access_Token") == "" {
+
+		goaster.Goaster.PushInfo("Goodbye")
+
+	}
 
 	return c.Redirect("/")
 
@@ -234,6 +238,7 @@ func HandleAuthCallback(c *fiber.Ctx) error {
 	setAuthCookie(c, accessToken)
 
 	log.Println("Access token successfully set in cookie")
+	
 
 	return HXRedirect(c, "/")
 }

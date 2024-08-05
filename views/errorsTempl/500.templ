@@ -2,11 +2,12 @@ package errorsTempl
 
 import ( 
 	"github.com/NikoMalik/GoTrack/views/layouts"
+	"github.com/gofiber/fiber/v2"
 )
 
 
-templ Error500() {
-	@layouts.BaseLayout(false) {
+templ Error500(c *fiber.Ctx) {
+	@layouts.BaseLayout(false, c) {
 	<div> 
 
 	<h1 class="uk-text-large uk-text-center text-blue-600">error 500</h1>

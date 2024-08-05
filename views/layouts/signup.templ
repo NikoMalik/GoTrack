@@ -8,6 +8,10 @@ import (
 	"github.com/nedpals/supabase-go"
 	
 	"github.com/NikoMalik/GoTrack/validate"
+	"github.com/NikoMalik/GoTrack/goaster"
+	"github.com/gofiber/fiber/v2"
+	
+	
 	
 	
 	
@@ -43,17 +47,23 @@ type SignupErrors struct {
 
 
 
-templ LoginIndex() {
-	@BaseLayout(true) {
+templ LoginIndex(c *fiber.Ctx) {
+	@BaseLayout(true, c) {
 		
 		@helper.MaxWidth("") {
 			<div class="flex justify-center mt-[calc(100vh-100vh+8rem)]">
 			<div class="max-w-md w-full bg-base-300 py-12 px-8 rounded-xl">
 				<h1 class="text-center text-xl  mb-20">Login to GoTrack </h1>
 				@LoginForm(supabase.UserCredentials{}, LoginErrors{}.FormErrors)
+
+				if cookie := c.Cookies("access_Token"); cookie != "" {
+		<script>
+			UIkit.notification({message: "Success", pos: "top-center"});
+		</script>
+	}
 				
 			
-				<a class="text-sm underline" href="/signup">Don't have an account? Signup here.</a>
+				<a class="text-sm underline" href="auth/signup">Don't have an account? Signup here.</a>
 			</div>
 		</div>
 		}
@@ -66,8 +76,8 @@ templ LoginIndex() {
 
 
 // SignupIndex renders the signup page
-templ SignupIndex() {
-	@BaseLayout(true) {
+templ SignupIndex(c *fiber.Ctx) {
+	@BaseLayout(true, c) {
 		
 		@helper.MaxWidth("") {
 			<div class="flex justify-center mt-[calc(100vh-100vh+8rem)]">
@@ -177,7 +187,7 @@ type LoginErrors struct {
 
 
 templ LoginForm(creds supabase.UserCredentials, errors validate.Errors) {
-	<form hx-post="/auth/login" hx-swap="outerHTML" class="space-y-4" hx-reset-on-success hx-on="htmx:afterRequest: if (event.detail.successful) { location.reload(); }">
+	<form hx-post="/auth/login"  hx-swap="outerHTML" class="space-y-4" hx-trigger="submit" hx-reset-on-success>
 		<div class="w-full">
 			<div class="label">
 				<span class="label-text">Email Address</span>
@@ -209,13 +219,23 @@ templ LoginForm(creds supabase.UserCredentials, errors validate.Errors) {
 			if errors.Has("verified") {
 				<div class="text-red-500 text-xs">{ errors.Get("verified")[0] }</div>
 			}
-		<button type="submit" class="uk-button uk-button-primary w-full rounded-lg">
+		
+		<button type="submit" class="uk-button uk-button-primary w-full rounded-lg " 
+			
+			>
 			Login <i class="fa fa-arrow-right" aria-hidden="true"></i>
 		</button>
+		
+		
+		
 
 		<button type="submit" hx-post="/auth/signup/github" class="uk-button uk-button-default w-full">
 			Login with GitHub <i class="fa fa-arrow-right" aria-hidden="true"></i>
 		</button>
+
+
+
+		// @ToastSuccess(msgType string, toaster *goaster.Toaster, message string)
 	</form>
 }
 
@@ -241,21 +261,36 @@ func inputAttrs(hasError bool) templ.Attributes {
 	}
 }
 
-templ Toast(msgType string, message string) {
-	<div class="uk-alert uk-alert-{msgType}">
-		
-		<div class="uk-alert-title">{msgType}</div>
-		<div class="uk-alert-description">{message}</div>
-	</div>
+templ Toast(msgType string, toaster *goaster.Toaster, message string) {
+	<p > 
+	@toaster.Error(message)
+	@goaster.GoasterJS(toaster, nil)
+		@LoginForm(supabase.UserCredentials{}, LoginErrors{}.FormErrors)
+
+
+	</p>
 }
 
-templ ToastSuccess(msgType string, message string) {
+templ ToastSuccess(msgType string, toaster *goaster.Toaster, message string) {
+	<p > 
+	@toaster.Success(message)
+	@goaster.GoasterJS(toaster, nil)
+
+
+
+	</p>
+	
+}
+	 
+
+templ ToastLogout(msgType string, toaster *goaster.Toaster, message string) {
+	<p>
+	@toaster.Info(message)
+	@goaster.GoasterJS(toaster, nil)
+
+
+
+	</p>
+
 
 }
-
-
-
-
-
-
-

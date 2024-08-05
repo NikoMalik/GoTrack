@@ -1,0 +1,38 @@
+package layouts 
+
+
+
+import (
+	"github.com/NikoMalik/GoTrack/views/helper"
+	"github.com/gofiber/fiber/v2"
+	 
+
+)
+	
+
+
+
+
+
+
+
+templ Dashboard(c *fiber.Ctx, data map[string]any) {
+	@BaseLayout(true, c) {
+    @helper.MaxWidth("") {
+
+		if cookie := c.Cookies("visited"); cookie == "" {
+				
+					<h1 class="uk-text-bolder"> Gay </h1>
+				
+			}
+
+
+
+
+
+
+
+	}
+}
+	
+}

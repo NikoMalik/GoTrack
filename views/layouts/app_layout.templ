@@ -2,18 +2,25 @@ package layouts
 
 import (
 	"github.com/NikoMalik/GoTrack/views/components"
+	"github.com/gofiber/fiber/v2"
 	
 
 )
 
-var pricing = "/pricing"
 
-templ App() {
-	@BaseLayout(true) {
+
+templ App(c *fiber.Ctx) {
+	@BaseLayout(true, c) {
         
 		
             <div class="flex justify-center items-center py-20 mb-20">
-                @components.Index()
+             
+			<p>
+			if cookie := c.Cookies("visited"); cookie == "" {
+				@components.Cookie(true)
+			}
+
+			</p>
 			{ children... }
             </div>
 

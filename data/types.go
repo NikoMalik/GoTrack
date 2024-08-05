@@ -1,33 +1,19 @@
 package data
 
 import (
-	"database/sql"
 	"time"
 
 	"github.com/nedpals/supabase-go"
 )
 
-type User struct {
-	ID           string `bun:",pk,autoincrement"`
-	Name         string `bun:",notnull"`
-	Email        string `bun:",notnull"`
-	PasswordHash string `bun:",notnull"`
-	AccessLevel  int
-	CreatedAt    time.Time
-	UpdatedAt    time.Time
-	DeletedAt    *time.Time
-	Preferences  map[string]string
-
-	EmailVerifiedAt sql.NullTime
-}
-
 const (
-	UserSignupEvent         = "auth.signup"
-	ResendVerificationEvent = "auth.resend.verification"
+	defaultLimit    = 15
+	UserSignupEvent = "auth.signup"
 )
 
 type UserWithVerificationToken struct {
-	User *supabase.AuthenticatedDetails
+	User    *supabase.AuthenticatedDetails
+	Message any
 	// Token *supabase.AuthenticatedDetails
 }
 
@@ -50,8 +36,35 @@ type Preferences struct {
 	UpdatedAt  time.Time
 }
 
+type DomainTrackingInfo struct {
+	ServerIP      string
+	Issuer        string
+	Port          string
+	SignatureAlgo string
+	PublicKeyAlgo string
+	EncodedPEM    string
+	PublicKey     string
+	Signature     string
+	DNSNames      string
+	KeyUsage      string
+	ExtKeyUsages  []string `bun:",array"`
+	Expires       time.Time
+	Status        string
+	LastPollAt    time.Time
+	Latency       int
+	Error         string
+}
+
+type DomainTracking struct {
+	ID         int64 `bun:"id,pk,autoincrement"`
+	User       *supabase.User
+	DomainName string
+
+	DomainTrackingInfo
+}
+
 type Host struct {
-	ID            int    `bun:",pk,autoincrement"`
+	ID            int    `bun:"id,pk,autoincrement,notnull"`
 	HostName      string `bun:",notnull"`
 	CanonicalName string `bun:",notnull"`
 	URL           *string
